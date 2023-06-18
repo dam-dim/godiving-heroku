@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+<nav th:replace="fragments/navigation::navbar"></nav>
+
+<div class="container text-center">
+    <div class="row">
+        <h1>Edit a Dive</h1>
+    </div>
+    <div class="row justify-content-center">
+        <hr class="w-25">
+    </div>
+    <div class="row justify-content-center mb-4">
+        <div class="col-4">
+            <form
+                    th:action="@{/services/dives/{id}/edit(id = *{id})}"
+                    th:method="PATCH"
+                    th:object="${diveModel}">
+                <div class="mb-3">
+                    <label for="exampleInputDiveType1" class="form-label">Dive Type</label>
+                    <input
+                            th:field="*{type}"
+                            th:errorclass="is-invalid"
+                            id="exampleInputDiveType1"
+                            type="text"
+                            class="form-control"
+                            aria-describedby="diveTypeHelpInLine">
+                    <small
+                            th:if="${#fields.hasErrors('type')}"
+                            th:errors="*{type}"
+                            id="diveTypeHelpInLine"
+                            class="invalid-feedback bg-danger text-light rounded">
+                        Please fill in a name.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputDiveLevel1" class="form-label">Dive Level</label>
+                    <select
+                            th:errorclass="is-invalid"
+                            name="level"
+                            type="text"
+                            class="form-control"
+                            id="exampleInputDiveLevel1"
+                            aria-describedby="diveLevelHelpInLine">
+                        <option
+                                th:each="l : ${levels}"
+                                th:value="${l}"
+                                th:text="${l}"
+                                th:selected="${l} == *{level}">
+                        </option>
+                    </select>
+                    <small
+                            th:if="${#fields.hasErrors('level')}"
+                            th:errors="*{level}"
+                            id="diveLevelHelpInLine"
+                            class="invalid-feedback bg-danger text-light rounded">
+                        Please fill in a level.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputDiveDescription1" class="form-label">Dive Description</label>
+                    <textarea
+                            th:field="*{description}"
+                            th:errorclass="is-invalid"
+                            class="form-control"
+                            id="exampleInputDiveDescription1"
+                            aria-describedby="diveDescriptionHelpInLine">
+                            </textarea>
+                    <small
+                            th:if="${#fields.hasErrors('description')}"
+                            th:errors="*{description}"
+                            id="diveDescriptionHelpInLine"
+                            class="invalid-feedback bg-danger text-light rounded">
+                        Please fill in a description.
+                    </small>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputDiveImageUrl1" class="form-label">Dive Image Url</label>
+                    <input
+                            th:field="*{imageUrl}"
+                            th:errorclass="is-invalid"
+                            type="text"
+                            class="form-control"
+                            id="exampleInputDiveImageUrl1"
+                            aria-describedby="diveImageUrlHelpInLine">
+                    <small
+                            th:if="${#fields.hasErrors('imageUrl')}"
+                            th:errors="*{imageUrl}"
+                            id="diveImageUrlHelpInLine"
+                            class="invalid-feedback bg-danger text-light rounded">
+                        Please fill in a url.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>

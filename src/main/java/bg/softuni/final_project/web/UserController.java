@@ -1,0 +1,82 @@
+package bg.softuni.final_project.web;
+
+import bg.softuni.final_project.model.binding.UserRegisterBindingModel;
+import bg.softuni.final_project.model.service.UserServiceModel;
+import bg.softuni.final_project.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.validation.Valid;
+
+@Controller
+@RequestMapping("/users")
+public class UserController {
+
+    private final UserService userService;
+    private final ModelMapper modelMapper;
+
+    public UserController(UserService userService, ModelMapper modelMapper) {
+        this.userService = userService;
+        this.modelMapper = modelMapper;
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @PostMapping("/login-error")
+    public String failedLogin(
+            @ModelAttribute(UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY)
+                    String username,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        redirectAttributes.addFlashAttribute("bad_credentials", true);
+        redirectAttributes.addFlashAttribute("username", username);
+
+        return "redirect:/users/login";
+    }
+
+    @GetMapping("/register")
+    public String register(Model model) {
+        model.addAttribute("passwordsMatching", false);
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String registerConfirm(@Valid UserRegisterBindingModel userRegisterBindingModel,
+                                  BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+        boolean passwordsMatching = userRegisterBindingModel.getPassword()
+                .equals(userRegisterBindingModel.getConfirmPassword());
+
+        model.addAttribute("passwordsMatching", passwordsMatching);
+
+        if (bindingResult.hasErrors() || !passwordsMatching) {
+            redirectAttributes
+                    .addFlashAttribute("passwordsMatching", passwordsMatching)
+                    .addFlashAttribute("userRegisterBindingModel", userRegisterBindingModel)
+                    .addFlashAttribute("org.springframework.validation.BindingResult.userRegisterBindingModel",
+                            bindingResult);
+
+            return "redirect:register";
+        }
+
+        userService.registerUser(modelMapper.map(userRegisterBindingModel, UserServiceModel.class));
+
+        return "redirect:/";
+    }
+
+    @ModelAttribute
+    public UserRegisterBindingModel userRegisterBindingModel() {
+        return new UserRegisterBindingModel();
+    }
+}

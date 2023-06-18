@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head::head"></head>
+<body>
+    <nav th:replace="fragments/navigation::navbar"></nav>
+
+    <div class="container">
+        <div class="row text-center">
+            <h1>Admin Panel</h1>
+        </div>
+        <div class="row justify-content-center">
+            <hr class="w-25">
+        </div>
+
+        <h3 class="text-center mb-4">Anonymous Requests: <th:block th:text="${stats.getAnonRequests()}"></th:block></h3>
+        <h3 class="text-center mb-4">Authorized Requests: <th:block th:text="${stats.getAuthRequests()}"></th:block></h3>
+        <h3 class="text-center mb-4">Total Requests: <th:block th:text="${stats.getTotalRequests()}"></th:block></h3>
+
+        <div class="row justify-content-center mb-5 mt-5">
+            <div class="col-3">
+                <a href="/services/courses/add" class="btn btn-outline-primary w-100">Add a Course</a>
+            </div>
+            <div class="col-3">
+                <a href="/services/dives/add" class="btn btn-outline-primary w-100">Add a Dive</a>
+            </div>
+        </div>
+
+        <section th:if="${courses.size() > 0}">
+            <div class="row text-center">
+                <h2>Courses clicks</h2>
+            </div>
+            <div class="row text-center" th:each="course : ${courses}">
+                <div class="col">
+                    <h4 th:text="*{course.name}"></h4>
+                </div>
+                <div class="col">
+                    <h4 th:text="*{course.clicks}"></h4>
+                </div>
+            </div>
+        </section>
+
+        <section th:if="${allNotAdmin.size() > 0}">
+            <div class="row text-center">
+                <h2>Users</h2>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h4>Username</h4>
+                </div>
+<!--                <div class="col">-->
+<!--                    <h4>Full Name</h4>-->
+<!--                </div>-->
+<!--                <div class="col">-->
+<!--                    <h4>Email</h4>-->
+<!--                </div>-->
+                <div class="col">
+                    <h4>Role</h4>
+                </div>
+                <div class="col">
+                    <h4>Actions</h4>
+                </div>
+                <hr>
+            </div>
+            <div class="row" th:each="user : ${allNotAdmin}">
+                <div class="col">
+                    <h5 th:text="${user.username}">Username</h5>
+                </div>
+<!--                <div class="col">-->
+<!--                    <h5 th:text="|${user.firstName} ${user.lastName}|">Full Name</h5>-->
+<!--                </div>-->
+<!--                <div class="col">-->
+<!--                    <h5 th:text="${user.email}">Email</h5>-->
+<!--                </div>-->
+                <div class="col">
+                    <h5 th:text="${user.role.getRole().name().toLowerCase()}">Role</h5>
+                </div>
+                <div class="col">
+                    <form
+                            th:action="@{/admin/{id}(id=${user.id})}"
+                            th:method="DELETE">
+                        <input type="submit" class="btn btn-outline-danger mb-3" value="Delete">
+                    </form>
+                    <form
+                            th:action="@{/admin/{id}(id=${user.id})}"
+                            th:method="PATCH"
+                            th:object="${adminBindingModel}">
+                        <div class="mb-3">
+<!--                            <label for="exampleInputUserRole1" class="form-label">UserRole</label>-->
+                            <select
+                                    th:field="*{role}"
+                                    th:errorclass="is-invalid"
+                                    type="text"
+                                    class="form-control"
+                                    id="exampleInputUserRole1"
+                                    aria-describedby="userRoleHelpInLine">
+                                <option selected value="">You may choose a new role</option>
+                                <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                            </select>
+                            <small
+                                    th:if="${#fields.hasErrors('role')}"
+                                    th:errors="*{role}"
+                                    id="userRoleHelpInLine"
+                                    class="invalid-feedback bg-danger text-light rounded">
+                                Please choose a role.
+                            </small>
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">Submit</button>
+                    </form>
+                </div>
+                <hr>
+            </div>
+        </section>
+
+    </div>
+
+    <footer th:replace="fragments/footer::footer"></footer>
+</body>
+</html>
